@@ -1,109 +1,78 @@
-my_books = {}
-
-my_list = s.split(“ / n”)
-
-k = 0
-for book in my_list:
-    item = book.split(“ | ”)
-    my_books.update(k: item)
-    k += 1
-
-newer_books = []
-for item in my_books:
-    if my_books[2] > 1900:
-        newer_books.append(item)
-
-// newer_books.sort()
-
-for new_book in newer_books:
-    author_listed = newer_book[1].split(“, ”)
-    author = author_listed[1] +” “+author[0]
-    new_book[1] = author
-
-for new_book in newer_books:
-    print(f”\”{newer_book[0]}\” by
-    {newer_book[1]}({newer_book[3]})”)
-
-    == == == == =
+import sys
+from math import floor
 
 
-    A
-    list
-    of
-    all
-    decades
-    from the earliest
+def main():
+    s=sys.stdin.readlines() #pythonic entry of multi-lined input. Stores as a list.
+    books=convert_input_to_dictionary(s)
+    newer_books=filter_by_year(books)
+    sorted_newer_books=sort_by_author(newer_books)
+    format_my_list_of(sorted_newer_books)
 
-    decade in the
-    book
-    list.
-    And
-    the
-    number
-    of
-    books in that
-    decade, up
-    to
-    the
-    present.
+    #start part 2:
+    list_decades(books)
 
-    1800(1)
-    1810(23)
-    1820(0)
-    1830(15)
-    …
-    2020(10)
-
-    my_books = {}
-
-    my_list = s.split(“ / n”)
-
-    k = 0
-    for book in my_list:
-        item = book.split(“ | ”)
-        my_books.update(k: item)
+def convert_input_to_dictionary(s): #Returns dictionary of entries.
+    my_books = {} #dictionary to store each book from the dataset
+    k = 0 #key value for my_books. Increased on each iteration of the following loop.
+    for book in s:
+        item = book.split("|")
+        item[2]=item[2].replace("\n", "") #this removes the "/n" from the date (added from .readlines())
+        my_books.update({k:item})
         k += 1
+    return my_books
 
+def filter_by_year(my_books, year=1900): #function to filter books by year. Optional parameter of year; default value 1900. Returns list of newer books.
     newer_books = []
     for item in my_books:
-        if my_books[2] > 1900:
-            newer_books.append(item)
+        publication_date=my_books[item][2]
+        if int(publication_date)> year:
+            newer_books.append(my_books[item])
+    return newer_books
 
-    // newer_books.sort()
+def sort_by_author(my_books): #this functionality was absent from my original code.
+    my_books.sort(key=lambda x:x[1])
+    return my_books
 
-    for new_book in newer_books:
-        author_listed = newer_book[1].split(“, ”)
-        author = author_listed[1] +” “+author[0]
-        new_book[1] = author
-
-    for new_book in newer_books:
-        print(f”\”{newer_book[0]}\” by
-        {newer_book[1]}({newer_book[3]})”)
-
-        earliest_decade = 0
-        decades = {}
-        decade = 0
-        for item in my_list:
-            if item[2] <= earliest_decade:  # setting lowest decade
-                earliest_decade = floor(item[2] / 10) * 10
-            decade = int(floor(item[2] / 10) * 10
-
-            if decade in decades.keys():
-                decades.update(decade: decades[decade] += 1)
+def format_my_list_of(books): #this will create the formatted output.
+    for book in books:
+        try:
+            author_listed = book[1].split(", ")
+            if len(author_listed)==2:
+                author = author_listed[1] +" "+author_listed[0]
+                book[1] = author
             else:
-            decades.update(decade: 1)
+                author = author_listed[1] + " " + author_listed[0]+" "+author_listed[3] #accounts for honorary titles
+                book[1] = author
+        except IndexError: #accounts for authors with single names
+            continue
 
-            i = earliest_decade
+    for book in books:
+        print(f"\"{book[0]}\" by {book[1]} ({book[2]})")
 
-            for i in range(2020):
-                if
-            i in decades.keys():
-            print(f”{i} \({decades[i]}\))
-            else:
-            print(f”{i} \(0\))
-            i += 10
+#================END OF PART 1=====================================
+
+def list_decades(my_list):
+    earliest_decade = 2024
+    decades = {}
+    decade = 0
+    for item in my_list:
+        if int(my_list[item][2]) <= earliest_decade:  # setting lowest decade
+            earliest_decade = floor(int(my_list[item][2]) / 10) * 10
+        decade = floor(int(my_list[item][2]) / 10) * 10
+
+        if decade in decades.keys():
+            decades.update({decade: int(decades[decade])+1})
+        else:
+            decades.update({decade:1})
+
+        i = earliest_decade
 
 
-        def decadeify(year):
-            return math.floor(year / 10) * 10
+    for i in range(earliest_decade,2020, 10):
+        if i in decades.keys():
+            print(f"{i} ({decades[i]})")
+        else:
+            print(f"{i} (0)")
 
+main()
